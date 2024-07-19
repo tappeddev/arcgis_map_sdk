@@ -14,7 +14,7 @@ A new Flutter project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'ArcGIS-Runtime-Toolkit-iOS'
+  s.dependency 'ArcGIS-Runtime-Toolkit-iOS', '100.15.2'
   s.platform = :ios, '13.0'
 
   # Flutter.framework does not contain a i386 slice.
