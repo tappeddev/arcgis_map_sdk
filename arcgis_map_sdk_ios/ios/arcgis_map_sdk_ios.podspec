@@ -14,6 +14,7 @@ A new Flutter project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
+  s.dependency 'ArcGIS-Runtime-SDK-iOS', '100.15.1'
   s.dependency 'ArcGIS-Runtime-Toolkit-iOS', '100.15.1'
   s.platform = :ios, '13.0'
 
