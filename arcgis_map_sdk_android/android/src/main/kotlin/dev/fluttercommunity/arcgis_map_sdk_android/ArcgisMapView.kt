@@ -295,7 +295,6 @@ internal class ArcgisMapView(
             }
             val autoPanMode = mode.autoPanModeFromString()
             if (autoPanMode != null) {
-                mapView.locationDisplay.courseSymbol = null
                 mapView.locationDisplay.autoPanMode = autoPanMode
                 result.success(true)
             } else {
