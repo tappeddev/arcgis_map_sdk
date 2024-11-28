@@ -58,7 +58,8 @@ internal class ArcgisMapView(
     private val binding: FlutterPluginBinding,
 ) : PlatformView {
 
-    private val view: View = LayoutInflater.from(context).inflate(R.layout.vector_map_view, null)
+    // private val view: View = LayoutInflater.from(context).inflate(R.layout.vector_map_view, null)
+    private val view: View = MapView()
     private var mapView: MapView
     private val map = ArcGISMap()
     private val defaultGraphicsOverlay = GraphicsOverlay()
