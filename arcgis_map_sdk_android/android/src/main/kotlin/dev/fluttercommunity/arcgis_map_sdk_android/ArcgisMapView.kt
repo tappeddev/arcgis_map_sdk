@@ -59,8 +59,7 @@ internal class ArcgisMapView(
 ) : PlatformView {
 
     // private val view: View = LayoutInflater.from(context).inflate(R.layout.vector_map_view, null)
-    private val view: View = MapView(context)
-    private var mapView: MapView
+    private val mapView: MapView= MapView(context)
     private val map = ArcGISMap()
     private val defaultGraphicsOverlay = GraphicsOverlay()
     private val graphicsParser = GraphicsParser(binding)
@@ -73,15 +72,13 @@ internal class ArcgisMapView(
     private val methodChannel =
         MethodChannel(binding.binaryMessenger, "dev.fluttercommunity.arcgis_map_sdk/$viewId")
 
-    override fun getView(): View = view
+    override fun getView(): View = mapView
 
     init {
         mapOptions.apiKey?.let(ArcGISRuntimeEnvironment::setApiKey)
         mapOptions.licenseKey?.let(ArcGISRuntimeEnvironment::setLicense)
 
         initialZoom = mapOptions.zoom.roundToInt()
-
-        mapView = view.findViewById(R.id.mapView)
 
         mapOptions.isAttributionTextVisible?.let { mapView.isAttributionTextVisible = it }
 
