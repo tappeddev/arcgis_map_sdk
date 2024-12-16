@@ -349,4 +349,30 @@ class MethodChannelArcgisMapPlugin extends ArcgisMapPlatform {
       isAttributionTextVisible,
     );
   }
+
+  @override
+  Future<void> determineClosestPOI(
+    int mapId,
+    RoutePoint from,
+    List<RoutePoint> pois,
+  ) {
+    return _methodChannelBuilder(mapId).invokeMethod(
+      "determine_closest_POI",
+      {
+        'from': from.toJson(),
+        'pois': pois.map((poi) => poi.toJson()).toList(),
+      },
+    );
+  }
+
+  @override
+  Future<void> determineRouteFromTo(int mapId, RoutePoint from, RoutePoint to) {
+    return _methodChannelBuilder(mapId).invokeMethod(
+      "determine_route_from_to",
+      {
+        'from': from.toJson(),
+        'to': to.toJson(),
+      },
+    );
+  }
 }
