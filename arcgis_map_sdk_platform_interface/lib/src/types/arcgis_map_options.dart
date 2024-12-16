@@ -30,6 +30,7 @@ class ArcgisMapOptions {
   final BaseMap? basemap;
   final Ground? ground;
   final List<String>? vectorTilesUrls;
+  final String? routeServiceUrl;
   final List<DefaultWidget> defaultUiList;
   final bool isPopupEnabled;
   final bool? isAttributionTextVisible;
@@ -57,6 +58,7 @@ class ArcgisMapOptions {
     this.basemap,
     this.ground,
     this.vectorTilesUrls,
+    this.routeServiceUrl,
     this.isPopupEnabled = false,
     this.isAttributionTextVisible,
   });
