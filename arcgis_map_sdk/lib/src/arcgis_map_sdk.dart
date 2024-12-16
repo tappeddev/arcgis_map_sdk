@@ -41,6 +41,7 @@ class ArcgisMap extends StatefulWidget {
     this.onMapCreated,
     this.vectorTileLayerUrls,
     this.isAttributionTextVisible,
+    this.routeServiceUrl,
     super.key,
   }) : assert(
           basemap != null ||
@@ -78,6 +79,10 @@ class ArcgisMap extends StatefulWidget {
   /// is ignored.
   final List<String>? vectorTileLayerUrls;
 
+  /// Allows the map to execute different routing tasks by providing a valid
+  /// ArcGIS route service URL.
+  final String? routeServiceUrl;
+
   final void Function(ArcgisMapController controller)? onMapCreated;
 
   @override
@@ -112,6 +117,7 @@ class _ArcgisMapState extends State<ArcgisMap> {
     yMin: widget.yMin,
     yMax: widget.yMax,
     vectorTilesUrls: widget.vectorTileLayerUrls,
+    routeServiceUrl: widget.routeServiceUrl,
     isAttributionTextVisible: widget.isAttributionTextVisible,
   );
 
@@ -169,6 +175,7 @@ class _ArcgisMapState extends State<ArcgisMap> {
       yMin: widget.yMin,
       yMax: widget.yMax,
       vectorTilesUrls: widget.vectorTileLayerUrls,
+      routeServiceUrl: widget.routeServiceUrl,
       defaultUiList: widget.defaultUiList,
       isAttributionTextVisible: widget.isAttributionTextVisible,
     );
