@@ -36,6 +36,7 @@ extension ArcgisMapOptionsJsonExtension on ArcgisMapOptions {
       'licenseKey': licenseKey,
       'basemap': basemap?.name,
       "vectorTilesUrls": vectorTilesUrls,
+      "routeServiceUrl": routeServiceUrl,
       'initialCenter': initialCenter.toMap(),
       'isInteractive': isInteractive,
       'zoom': zoom,
