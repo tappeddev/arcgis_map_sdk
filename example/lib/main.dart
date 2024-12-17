@@ -481,6 +481,50 @@ class _ExampleMapState extends State<ExampleMap> {
                               );
                             },
                           ),
+                          FloatingActionButton(
+                            heroTag: "route-to-closest-poi",
+                            onPressed: () {
+                              _controller?.determineClosestPOI(
+                                  from: RoutePoint(
+                                    name: "Tapped HQ",
+                                    latitude: tappedHQ.latitude,
+                                    longitude: tappedHQ.longitude,
+                                  ),
+                                  pois: [
+                                    RoutePoint(
+                                      name: "POI #1",
+                                      latitude: 48.204473809410615,
+                                      longitude: 11.4513423666358,
+                                    ),
+                                    RoutePoint(
+                                      name: "POI #2",
+                                      latitude: 48.205636645145659,
+                                      longitude: 11.395690217614174,
+                                    ),
+                                  ]);
+                            },
+                            backgroundColor: Colors.grey,
+                            child: const Icon(Icons.alt_route),
+                          ),
+                          FloatingActionButton(
+                            heroTag: "route-from-to",
+                            onPressed: () {
+                              _controller?.determineRouteFromTo(
+                                from: RoutePoint(
+                                  name: "Tapped HQ",
+                                  latitude: tappedHQ.latitude,
+                                  longitude: tappedHQ.longitude,
+                                ),
+                                to: RoutePoint(
+                                  name: "POI #2",
+                                  latitude: 48.205636645145659,
+                                  longitude: 11.395690217614174,
+                                ),
+                              );
+                            },
+                            backgroundColor: Colors.grey,
+                            child: const Icon(Icons.route),
+                          ),
                           if (kIsWeb)
                             FloatingActionButton(
                               heroTag: "3d-map-button",

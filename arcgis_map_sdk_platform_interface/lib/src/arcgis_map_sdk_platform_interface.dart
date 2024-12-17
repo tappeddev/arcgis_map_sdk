@@ -310,4 +310,18 @@ class ArcgisMapPlatform extends PlatformInterface {
       'updateIsAttributionTextVisible() has not been implemented.',
     );
   }
+
+  Future<void> determineClosestPOI(
+    int mapId,
+    RoutePoint from,
+    List<RoutePoint> pois,
+  ) {
+    throw UnimplementedError('determineClosestPOI() has not been implemented.');
+  }
+
+  Future<void> determineRouteFromTo(int mapId, RoutePoint from, RoutePoint to) {
+    throw UnimplementedError(
+      'determineRouteFromTo() has not been implemented.',
+    );
+  }
 }

@@ -2,6 +2,7 @@ package dev.fluttercommunity.arcgis_map_sdk_android
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment
@@ -28,14 +29,24 @@ import com.esri.arcgisruntime.mapping.view.Graphic
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay
 import com.esri.arcgisruntime.mapping.view.LocationDisplay.AutoPanMode
 import com.esri.arcgisruntime.mapping.view.MapView
+import com.esri.arcgisruntime.symbology.SimpleLineSymbol
+import com.esri.arcgisruntime.symbology.SimpleLineSymbol.Style
 import com.esri.arcgisruntime.symbology.Symbol
+import com.esri.arcgisruntime.tasks.networkanalysis.ClosestFacilityTask
+import com.esri.arcgisruntime.tasks.networkanalysis.Facility
+import com.esri.arcgisruntime.tasks.networkanalysis.Incident
+import com.esri.arcgisruntime.tasks.networkanalysis.Route
+import com.esri.arcgisruntime.tasks.networkanalysis.RouteTask
+import com.esri.arcgisruntime.tasks.networkanalysis.Stop
 import com.google.gson.reflect.TypeToken
 import dev.fluttercommunity.arcgis_map_sdk_android.model.AnimationOptions
 import dev.fluttercommunity.arcgis_map_sdk_android.model.ArcgisMapOptions
 import dev.fluttercommunity.arcgis_map_sdk_android.model.LatLng
 import dev.fluttercommunity.arcgis_map_sdk_android.model.UserPosition
 import dev.fluttercommunity.arcgis_map_sdk_android.model.ViewPadding
+import dev.fluttercommunity.arcgis_map_sdk_android.model.toAGSPoint
 import dev.fluttercommunity.arcgis_map_sdk_android.util.GraphicsParser
+import io.flutter.Log
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
@@ -101,7 +112,7 @@ internal class ArcgisMapView(
         mapView.graphicsOverlays.add(defaultGraphicsOverlay)
 
         mapView.addMapScaleChangedListener {
-            if(mapView.mapScale.isNaN()) return@addMapScaleChangedListener
+            if (mapView.mapScale.isNaN()) return@addMapScaleChangedListener
 
             val zoomLevel = getZoomLevel(mapView)
             zoomStreamHandler.addZoom(zoomLevel)
@@ -115,7 +126,7 @@ internal class ArcgisMapView(
             val wgs84Center = GeometryEngine.project(center, SpatialReferences.getWgs84()) as? Point
 
             val latLng = wgs84Center?.let {
-                LatLng(longitude = it.x,latitude = it.y)
+                LatLng(longitude = it.x, latitude = it.y)
             } ?: return@addViewpointChangedListener
 
             centerPositionStreamHandler.add(latLng)
@@ -200,6 +211,10 @@ internal class ArcgisMapView(
                 )
 
                 "export_image" -> onExportImage(result)
+
+                "determine_closest_POI" -> onDetermineClosestPOI(call = call, result = result)
+
+                "determine_route_from_to" -> onDetermineRouteFromTo(call = call, result = result)
 
                 else -> result.notImplemented()
             }
@@ -615,6 +630,219 @@ internal class ArcgisMapView(
             getFuture = { mapView.exportImageAsync() }
         )
 
+    }
+
+    private fun onDetermineClosestPOI(call: MethodCall, result: MethodChannel.Result) {
+        try {
+            val arguments = call.arguments as Map<String, Any>
+
+            Log.w("- Closest POI -", "Received Arguments: $arguments")
+
+            val relevantPOIs =
+                (arguments["pois"] as ArrayList<Map<String, Any>>).map { poi ->
+                    Facility(
+                        Point(poi["latitude"] as Double, poi["longitude"] as Double),
+                    ).apply {
+                        name = poi["name"] as String
+                    }
+                }
+            val from = arguments["from"] as Map<String, Any>
+            val currentLatLng = LatLng(
+                from["longitude"] as Double,
+                from["latitude"] as Double
+            )
+
+            Log.w(
+                "- Closest POI -",
+                "Extracted Arguments: $currentLatLng to ${relevantPOIs.size} POIs"
+            )
+
+            // Create a task to be able to determine the required information.
+            val closestFacilityTask = ClosestFacilityTask(context, mapOptions.routeServiceUrl)
+
+            Log.w("- Closest POI -", "Created Task: $closestFacilityTask")
+
+            val parameterFuture = closestFacilityTask.createDefaultParametersAsync()
+            parameterFuture.addDoneListener {
+                try {
+                    if (parameterFuture.isDone) {
+                        Log.w("- Closest POI -", "Future is done")
+
+                        val closestFacilityParameters = parameterFuture.get()
+
+                        Log.w("- Closest POI -", "Created Parameter: $closestFacilityParameters")
+
+                        // Apply the current coordinates and POIs to the parameters.
+                        closestFacilityParameters.apply {
+                            setIncidents(listOf(Incident(currentLatLng.toAGSPoint())))
+                            setFacilities(relevantPOIs)
+                        }
+
+                        Log.w("- Closest POI -", "Created Parameter: $closestFacilityParameters")
+
+                        val closestFacilitiesFuture =
+                            closestFacilityTask.solveClosestFacilityAsync(closestFacilityParameters)
+                        closestFacilitiesFuture.addDoneListener {
+                            try {
+                                Log.w("- Closest POI -", "Future is done")
+
+                                val closestFacilityResult = closestFacilitiesFuture.get()
+
+                                Log.w("- Closest POI -", "Solved Route: $closestFacilityResult")
+
+                                val rankedFacilities =
+                                    closestFacilityResult.getRankedFacilityIndexes(0)
+
+                                Log.w("- Closest POI -", "Facilities: $rankedFacilities")
+
+                                // If the result contains a facility, solve the route from incident to facility.
+                                if (rankedFacilities.isNotEmpty()) {
+                                    val closestFacilityIndex = rankedFacilities[0]
+                                    val route = closestFacilityResult.getRoute(
+                                        closestFacilityIndex,
+                                        0,
+                                    )
+                                    val routeSymbol = SimpleLineSymbol(
+                                        Style.SOLID,
+                                        0xFF0000FF.toInt(),
+                                        2.0f
+                                    )
+                                    val routeGraphic = Graphic(
+                                        route?.routeGeometry,
+                                        routeSymbol,
+                                    )
+
+                                    defaultGraphicsOverlay.graphics.add(routeGraphic)
+                                    Log.w("- Closest POI -", "Updated defaultGraphicsOverlay")
+                                }
+                            } catch (e: Exception) {
+                                Log.w(
+                                    "- Closest POI -",
+                                    "Error solving closest facilities: ${e.message}",
+                                )
+                                result.finishWithError(e)
+                            }
+                        }
+                    } else {
+                        Log.w("- Closest POI -", "Failed to load route parameters")
+                        result.finishWithError(Exception("Failed to load route parameters"))
+                    }
+                } catch (e: Exception) {
+                    Log.w("- Closest POI -", "Error creating route parameters: ${e.message}")
+                    result.finishWithError(e)
+                }
+            }
+        } catch (e: Exception) {
+            Log.w("- Closest POI -", "Failed to determine closest POI: $e")
+            result.finishWithError(e)
+        }
+    }
+
+    private fun onDetermineRouteFromTo(call: MethodCall, result: MethodChannel.Result) {
+        try {
+            val arguments = call.arguments as Map<String, Any>
+
+            Log.w("- Route -", "Received Arguments: $arguments")
+
+            val from = arguments["from"] as Map<String, Any>
+            val fromLatLng = LatLng(
+                from["longitude"] as Double,
+                from["latitude"] as Double
+            )
+            val to = arguments["to"] as Map<String, Any>
+            val toLatLng = LatLng(
+                to["longitude"] as Double,
+                to["latitude"] as Double
+            )
+
+            Log.w("- Route -", "Extracted Arguments: From $from to $to")
+
+            val routeTask = RouteTask(context, mapOptions.routeServiceUrl)
+
+            Log.w("- Route -", "Created Task: $routeTask")
+
+            val parameterFuture = routeTask.createDefaultParametersAsync()
+            parameterFuture.addDoneListener {
+                try {
+                    if (parameterFuture.isDone) {
+                        Log.w("- Route -", "Future is done")
+
+                        val routeParams = parameterFuture.get()
+
+                        Log.w("- Route -", "Created parameters: $routeParams")
+
+                        // create stops
+                        val stops = arrayListOf(
+                            Stop(
+                                Point(
+                                    fromLatLng.longitude,
+                                    fromLatLng.latitude,
+                                    SpatialReferences.getWgs84()
+                                )
+                            ),
+                            Stop(
+                                Point(
+                                    toLatLng.longitude,
+                                    toLatLng.latitude,
+                                    SpatialReferences.getWgs84()
+                                )
+                            )
+                        )
+
+                        // Apply the From and To coordinates to the parameters.
+                        routeParams.apply {
+                            setStops(stops)
+                            // set return directions as true to return turn-by-turn directions in the route's directionManeuvers
+                            isReturnDirections = true
+                        }
+
+                        val routeFuture = routeTask.solveRouteAsync(routeParams)
+                        routeFuture.addDoneListener {
+                            try {
+                                Log.w("- Route -", "Future is done")
+
+                                // solve the route
+                                val taskResult = routeFuture.get()
+                                val route = taskResult.routes[0] as Route
+
+                                Log.w("- Route -", "Created route: $route")
+
+                                // create a simple line symbol for the route
+                                val routeSymbol =
+                                    SimpleLineSymbol(Style.SOLID, Color.BLUE, 5f)
+
+                                // create a graphic for the route and add it to the graphics overlay
+                                defaultGraphicsOverlay.graphics.add(
+                                    Graphic(
+                                        route.routeGeometry,
+                                        routeSymbol
+                                    )
+                                )
+
+                                // get the list of direction maneuvers and display it
+                                // NOTE: to get turn-by-turn directions the route parameters
+                                //  must have the isReturnDirections parameter set to true.
+                                val directions = route.directionManeuvers
+                                Log.w("- Route -", "Directions: $directions")
+
+                            } catch (e: Exception) {
+                                Log.w("- Route -", "Error solving route: ${e.message}")
+                                result.finishWithError(e)
+                            }
+                        }
+                    } else {
+                        Log.w("- Route -", "Failed to load route parameters")
+                        result.finishWithError(Exception("Failed to load route parameters"))
+                    }
+                } catch (e: Exception) {
+                    Log.w("- Route -", "Error creating route parameters: ${e.message}")
+                    result.finishWithError(e)
+                }
+            }
+        } catch (e: Exception) {
+            Log.w("- Route -", "Failed to determine route: $e")
+            result.finishWithError(e)
+        }
     }
 
     /**

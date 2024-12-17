@@ -7,6 +7,7 @@ data class ArcgisMapOptions(
     val licenseKey: String?,
     val basemap: BasemapStyle?,
     val vectorTilesUrls: List<String>,
+    val routeServiceUrl: String?,
     val initialCenter: LatLng,
     val isInteractive: Boolean,
     val zoom: Double,

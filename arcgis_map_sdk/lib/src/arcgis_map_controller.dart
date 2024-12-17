@@ -331,4 +331,18 @@ class ArcgisMapController {
     return ArcgisMapPlatform.instance
         .updateIsAttributionTextVisible(mapId, isAttributionTextVisible);
   }
+
+  Future<void> determineClosestPOI({
+    required RoutePoint from,
+    required List<RoutePoint> pois,
+  }) async {
+    return ArcgisMapPlatform.instance.determineClosestPOI(mapId, from, pois);
+  }
+
+  Future<void> determineRouteFromTo({
+    required RoutePoint from,
+    required RoutePoint to,
+  }) async {
+    return ArcgisMapPlatform.instance.determineRouteFromTo(mapId, from, to);
+  }
 }
