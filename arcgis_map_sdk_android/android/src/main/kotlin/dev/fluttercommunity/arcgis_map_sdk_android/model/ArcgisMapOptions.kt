@@ -8,6 +8,7 @@ data class ArcgisMapOptions(
     val basemap: BasemapStyle?,
     val vectorTilesUrls: List<String>,
     val routeServiceUrl: String?,
+    val closestFacilitiesUrl: String?,
     val initialCenter: LatLng,
     val isInteractive: Boolean,
     val zoom: Double,

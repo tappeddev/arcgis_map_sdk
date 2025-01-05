@@ -2,7 +2,6 @@ package dev.fluttercommunity.arcgis_map_sdk_android
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment
@@ -42,6 +41,7 @@ import com.google.gson.reflect.TypeToken
 import dev.fluttercommunity.arcgis_map_sdk_android.model.AnimationOptions
 import dev.fluttercommunity.arcgis_map_sdk_android.model.ArcgisMapOptions
 import dev.fluttercommunity.arcgis_map_sdk_android.model.LatLng
+import dev.fluttercommunity.arcgis_map_sdk_android.model.RouteResult
 import dev.fluttercommunity.arcgis_map_sdk_android.model.UserPosition
 import dev.fluttercommunity.arcgis_map_sdk_android.model.ViewPadding
 import dev.fluttercommunity.arcgis_map_sdk_android.model.toAGSPoint
@@ -212,9 +212,9 @@ internal class ArcgisMapView(
 
                 "export_image" -> onExportImage(result)
 
-                "determine_closest_POI" -> onDetermineClosestPOI(call = call, result = result)
+                "determine_closest_POIs" -> onDetermineClosestPOIs(call = call, result = result)
 
-                "determine_route_from_to" -> onDetermineRouteFromTo(call = call, result = result)
+                "calculate_route" -> onCalculateRoute(call = call, result = result)
 
                 else -> result.notImplemented()
             }
@@ -632,18 +632,27 @@ internal class ArcgisMapView(
 
     }
 
-    private fun onDetermineClosestPOI(call: MethodCall, result: MethodChannel.Result) {
+    private fun onDetermineClosestPOIs(call: MethodCall, result: MethodChannel.Result) {
+        // Ensure this is never called without a closest facilities service url.
+        if (mapOptions.closestFacilitiesUrl == null) {
+            result.finishWithError(Exception("No closest facilities url provided, check map options"))
+        }
+
         try {
             val arguments = call.arguments as Map<String, Any>
 
             Log.w("- Closest POI -", "Received Arguments: $arguments")
 
             val relevantPOIs =
-                (arguments["pois"] as ArrayList<Map<String, Any>>).map { poi ->
+                (arguments["pointsOfInterest"] as ArrayList<Map<String, Any>>).map { poi ->
                     Facility(
-                        Point(poi["latitude"] as Double, poi["longitude"] as Double),
+                        Point(
+                            poi["longitude"] as Double,
+                            poi["latitude"] as Double,
+                            SpatialReferences.getWebMercator(),
+                        ),
                     ).apply {
-                        name = poi["name"] as String
+                        name = poi["identifier"] as String
                     }
                 }
             val from = arguments["from"] as Map<String, Any>
@@ -678,7 +687,7 @@ internal class ArcgisMapView(
                             setFacilities(relevantPOIs)
                         }
 
-                        Log.w("- Closest POI -", "Created Parameter: $closestFacilityParameters")
+                        Log.w("- Closest POI -", "Updated Parameters: $closestFacilityParameters")
 
                         val closestFacilitiesFuture =
                             closestFacilityTask.solveClosestFacilityAsync(closestFacilityParameters)
@@ -738,40 +747,31 @@ internal class ArcgisMapView(
         }
     }
 
-    private fun onDetermineRouteFromTo(call: MethodCall, result: MethodChannel.Result) {
+    private fun onCalculateRoute(call: MethodCall, result: MethodChannel.Result) {
+        // Ensure this is never called without a route service url.
+        if (mapOptions.routeServiceUrl == null) {
+            result.finishWithError(Exception("No route service url provided, check map options"))
+        }
+
         try {
             val arguments = call.arguments as Map<String, Any>
 
-            Log.w("- Route -", "Received Arguments: $arguments")
-
             val from = arguments["from"] as Map<String, Any>
-            val fromLatLng = LatLng(
-                from["longitude"] as Double,
-                from["latitude"] as Double
-            )
-            val to = arguments["to"] as Map<String, Any>
-            val toLatLng = LatLng(
-                to["longitude"] as Double,
-                to["latitude"] as Double
-            )
+            val fromCoordinates = from["coordinates"] as List<Double>
+            val fromLatLng = LatLng(fromCoordinates[0], fromCoordinates[1])
 
-            Log.w("- Route -", "Extracted Arguments: From $from to $to")
+            val to = arguments["to"] as Map<String, Any>
+            val toCoordinates = to["coordinates"] as List<Double>
+            val toLatLng = LatLng(toCoordinates[0], toCoordinates[1])
 
             val routeTask = RouteTask(context, mapOptions.routeServiceUrl)
-
-            Log.w("- Route -", "Created Task: $routeTask")
 
             val parameterFuture = routeTask.createDefaultParametersAsync()
             parameterFuture.addDoneListener {
                 try {
                     if (parameterFuture.isDone) {
-                        Log.w("- Route -", "Future is done")
-
                         val routeParams = parameterFuture.get()
 
-                        Log.w("- Route -", "Created parameters: $routeParams")
-
-                        // create stops
                         val stops = arrayListOf(
                             Stop(
                                 Point(
@@ -789,58 +789,37 @@ internal class ArcgisMapView(
                             )
                         )
 
-                        // Apply the From and To coordinates to the parameters.
                         routeParams.apply {
+                            // Apply the From and To coordinates to the parameters.
                             setStops(stops)
-                            // set return directions as true to return turn-by-turn directions in the route's directionManeuvers
+                            // Set return directions true to return turn-by-turn
+                            // directions in the route's directionManeuvers.
                             isReturnDirections = true
                         }
 
                         val routeFuture = routeTask.solveRouteAsync(routeParams)
                         routeFuture.addDoneListener {
                             try {
-                                Log.w("- Route -", "Future is done")
-
-                                // solve the route
                                 val taskResult = routeFuture.get()
                                 val route = taskResult.routes[0] as Route
 
-                                Log.w("- Route -", "Created route: $route")
+                                // Convert the route into a suitable route result.
+                                val routeResult = RouteResult.fromRoute(route)
 
-                                // create a simple line symbol for the route
-                                val routeSymbol =
-                                    SimpleLineSymbol(Style.SOLID, Color.BLUE, 5f)
-
-                                // create a graphic for the route and add it to the graphics overlay
-                                defaultGraphicsOverlay.graphics.add(
-                                    Graphic(
-                                        route.routeGeometry,
-                                        routeSymbol
-                                    )
-                                )
-
-                                // get the list of direction maneuvers and display it
-                                // NOTE: to get turn-by-turn directions the route parameters
-                                //  must have the isReturnDirections parameter set to true.
-                                val directions = route.directionManeuvers
-                                Log.w("- Route -", "Directions: $directions")
+                                result.success(routeResult.toJson())
 
                             } catch (e: Exception) {
-                                Log.w("- Route -", "Error solving route: ${e.message}")
                                 result.finishWithError(e)
                             }
                         }
                     } else {
-                        Log.w("- Route -", "Failed to load route parameters")
                         result.finishWithError(Exception("Failed to load route parameters"))
                     }
                 } catch (e: Exception) {
-                    Log.w("- Route -", "Error creating route parameters: ${e.message}")
                     result.finishWithError(e)
                 }
             }
         } catch (e: Exception) {
-            Log.w("- Route -", "Failed to determine route: $e")
             result.finishWithError(e)
         }
     }
