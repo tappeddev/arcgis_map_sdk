@@ -1,17 +1,17 @@
-class RoutePoint {
-  final String name;
+class PointOfInterest {
+  final String identifier;
   final double latitude;
   final double longitude;
 
-  RoutePoint({
-    required this.name,
+  PointOfInterest({
+    required this.identifier,
     required this.latitude,
     required this.longitude,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'name': name,
+      'identifier': identifier,
       'longitude': longitude,
       'latitude': latitude,
     };

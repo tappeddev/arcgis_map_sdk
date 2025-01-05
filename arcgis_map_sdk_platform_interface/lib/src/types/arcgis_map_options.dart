@@ -31,6 +31,7 @@ class ArcgisMapOptions {
   final Ground? ground;
   final List<String>? vectorTilesUrls;
   final String? routeServiceUrl;
+  final String? closestFacilitiesUrl;
   final List<DefaultWidget> defaultUiList;
   final bool isPopupEnabled;
   final bool? isAttributionTextVisible;
@@ -59,13 +60,14 @@ class ArcgisMapOptions {
     this.ground,
     this.vectorTilesUrls,
     this.routeServiceUrl,
+    this.closestFacilitiesUrl,
     this.isPopupEnabled = false,
     this.isAttributionTextVisible,
   });
 
   @override
   String toString() {
-    return 'ArcgisMapOptions{apiKey: $apiKey, licenseKey: $licenseKey, mapStyle: $mapStyle, initialCenter: $initialCenter, showLabelsBeneathGraphics: $showLabelsBeneathGraphics, isInteractive: $isInteractive, zoom: $zoom, tilt: $tilt, initialHeight: $initialHeight, heading: $heading, padding: $padding, rotationEnabled: $rotationEnabled, minZoom: $minZoom, maxZoom: $maxZoom, xMin: $xMin, xMax: $xMax, yMin: $yMin, yMax: $yMax, basemap: $basemap, ground: $ground, vectorTilesUrls: $vectorTilesUrls, defaultUiList: $defaultUiList, isPopupEnabled: $isPopupEnabled, isAttributionTextVisible: $isAttributionTextVisible}';
+    return 'ArcgisMapOptions{apiKey: $apiKey, licenseKey: $licenseKey, mapStyle: $mapStyle, initialCenter: $initialCenter, showLabelsBeneathGraphics: $showLabelsBeneathGraphics, isInteractive: $isInteractive, zoom: $zoom, tilt: $tilt, initialHeight: $initialHeight, heading: $heading, padding: $padding, rotationEnabled: $rotationEnabled, minZoom: $minZoom, maxZoom: $maxZoom, xMin: $xMin, xMax: $xMax, yMin: $yMin, yMax: $yMax, basemap: $basemap, ground: $ground, vectorTilesUrls: $vectorTilesUrls, routeServiceUrl: $routeServiceUrl, closestFacilitiesUrl: $closestFacilitiesUrl, defaultUiList: $defaultUiList, isPopupEnabled: $isPopupEnabled, isAttributionTextVisible: $isAttributionTextVisible}';
   }
 }
 

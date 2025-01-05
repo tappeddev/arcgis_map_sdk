@@ -42,6 +42,7 @@ class ArcgisMap extends StatefulWidget {
     this.vectorTileLayerUrls,
     this.isAttributionTextVisible,
     this.routeServiceUrl,
+    this.closestFacilitiesUrl,
     super.key,
   }) : assert(
           basemap != null ||
@@ -83,6 +84,10 @@ class ArcgisMap extends StatefulWidget {
   /// ArcGIS route service URL.
   final String? routeServiceUrl;
 
+  /// Allows the map to execute closest facility tasks by providing a valid
+  /// ArcGIS route service URL.
+  final String? closestFacilitiesUrl;
+
   final void Function(ArcgisMapController controller)? onMapCreated;
 
   @override
@@ -118,6 +123,7 @@ class _ArcgisMapState extends State<ArcgisMap> {
     yMax: widget.yMax,
     vectorTilesUrls: widget.vectorTileLayerUrls,
     routeServiceUrl: widget.routeServiceUrl,
+    closestFacilitiesUrl: widget.closestFacilitiesUrl,
     isAttributionTextVisible: widget.isAttributionTextVisible,
   );
 
@@ -176,6 +182,7 @@ class _ArcgisMapState extends State<ArcgisMap> {
       yMax: widget.yMax,
       vectorTilesUrls: widget.vectorTileLayerUrls,
       routeServiceUrl: widget.routeServiceUrl,
+      closestFacilitiesUrl: widget.closestFacilitiesUrl,
       defaultUiList: widget.defaultUiList,
       isAttributionTextVisible: widget.isAttributionTextVisible,
     );

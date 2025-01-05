@@ -351,28 +351,32 @@ class MethodChannelArcgisMapPlugin extends ArcgisMapPlatform {
   }
 
   @override
-  Future<void> determineClosestPOI(
+  Future<void> determineClosestPOIs(
     int mapId,
-    RoutePoint from,
-    List<RoutePoint> pois,
+    LatLng from,
+    List<PointOfInterest> pointsOfInterest,
   ) {
     return _methodChannelBuilder(mapId).invokeMethod(
-      "determine_closest_POI",
+      "determine_closest_POIs",
       {
         'from': from.toJson(),
-        'pois': pois.map((poi) => poi.toJson()).toList(),
+        'pointsOfInterest':
+            pointsOfInterest.map((poi) => poi.toJson()).toList(),
       },
     );
   }
 
   @override
-  Future<void> determineRouteFromTo(int mapId, RoutePoint from, RoutePoint to) {
-    return _methodChannelBuilder(mapId).invokeMethod(
-      "determine_route_from_to",
+  Future<RouteResult> calculateRoute(int mapId, LatLng from, LatLng to) {
+    return _methodChannelBuilder(mapId).invokeMethod<Map<Object?, Object?>>(
+      "calculate_route",
       {
         'from': from.toJson(),
         'to': to.toJson(),
       },
-    );
+    ).then((value) {
+      final map = value!.cast<dynamic, dynamic>();
+      return RouteResult.fromJson(map);
+    });
   }
 }

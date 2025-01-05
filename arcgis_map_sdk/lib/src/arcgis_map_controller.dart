@@ -332,17 +332,21 @@ class ArcgisMapController {
         .updateIsAttributionTextVisible(mapId, isAttributionTextVisible);
   }
 
-  Future<void> determineClosestPOI({
-    required RoutePoint from,
-    required List<RoutePoint> pois,
+  Future<void> determineClosestPOIs({
+    required LatLng from,
+    required List<PointOfInterest> pointsOfInterest,
   }) async {
-    return ArcgisMapPlatform.instance.determineClosestPOI(mapId, from, pois);
+    return ArcgisMapPlatform.instance.determineClosestPOIs(
+      mapId,
+      from,
+      pointsOfInterest,
+    );
   }
 
-  Future<void> determineRouteFromTo({
-    required RoutePoint from,
-    required RoutePoint to,
+  Future<RouteResult> calculateRoute({
+    required LatLng from,
+    required LatLng to,
   }) async {
-    return ArcgisMapPlatform.instance.determineRouteFromTo(mapId, from, to);
+    return ArcgisMapPlatform.instance.calculateRoute(mapId, from, to);
   }
 }

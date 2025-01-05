@@ -311,17 +311,17 @@ class ArcgisMapPlatform extends PlatformInterface {
     );
   }
 
-  Future<void> determineClosestPOI(
+  Future<void> determineClosestPOIs(
     int mapId,
-    RoutePoint from,
-    List<RoutePoint> pois,
+    LatLng from,
+    List<PointOfInterest> pointsOfInterest,
   ) {
     throw UnimplementedError('determineClosestPOI() has not been implemented.');
   }
 
-  Future<void> determineRouteFromTo(int mapId, RoutePoint from, RoutePoint to) {
+  Future<RouteResult> calculateRoute(int mapId, LatLng from, LatLng to) {
     throw UnimplementedError(
-      'determineRouteFromTo() has not been implemented.',
+      'calculateRoute() has not been implemented.',
     );
   }
 }
