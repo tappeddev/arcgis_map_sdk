@@ -30,6 +30,7 @@ class _RouteServiceExamplePageState extends State<RouteServiceExamplePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(centerTitle: true, title: Text("Route Service Example")),
       body: Stack(
         children: [
           ArcgisMap(
@@ -58,14 +59,44 @@ class _RouteServiceExamplePageState extends State<RouteServiceExamplePage> {
                 "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World",
           ),
           Positioned(
-            bottom: 40,
-            left: 40,
-            child: Row(
+            bottom: 100,
+            right: 10,
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 FloatingActionButton(
-                  heroTag: "move-camera-button",
-                  backgroundColor: Colors.yellow,
+                  heroTag: "zoom-in",
+                  onPressed: () {
+                    _controller?.zoomIn(
+                      lodFactor: 1,
+                      animationOptions: AnimationOptions(
+                        duration: 1000,
+                        animationCurve: AnimationCurve.easeIn,
+                      ),
+                    );
+                  },
+                  backgroundColor: Colors.grey,
+                  child: const Icon(Icons.add),
+                ),
+                const SizedBox(height: 10),
+                FloatingActionButton(
+                  heroTag: "zoom-out",
+                  onPressed: () {
+                    _controller?.zoomOut(
+                      lodFactor: 1,
+                      animationOptions: AnimationOptions(
+                        duration: 1000,
+                        animationCurve: AnimationCurve.easeIn,
+                      ),
+                    );
+                  },
+                  backgroundColor: Colors.grey,
+                  child: const Icon(Icons.remove),
+                ),
+                const SizedBox(height: 10),
+                FloatingActionButton(
+                  heroTag: "center-camera",
+                  backgroundColor: Colors.red,
                   child: const Icon(Icons.place_outlined),
                   onPressed: () {
                     _controller?.moveCamera(
@@ -80,7 +111,15 @@ class _RouteServiceExamplePageState extends State<RouteServiceExamplePage> {
                     );
                   },
                 ),
-                const SizedBox(width: 20),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 100,
+            left: 10,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
                 FloatingActionButton(
                   heroTag: "route-to-target-one",
                   onPressed: () async {
@@ -92,9 +131,12 @@ class _RouteServiceExamplePageState extends State<RouteServiceExamplePage> {
                       to: routeTargets[0],
                     );
 
-                    addRouteToMap(routeResultOne!);
+                    addRouteToMap(
+                      routeResult: routeResultOne!,
+                      routeColor: Colors.green,
+                    );
                   },
-                  backgroundColor: Colors.grey,
+                  backgroundColor: Colors.green,
                   child: const Icon(Icons.looks_one_sharp),
                 ),
                 const SizedBox(width: 20),
@@ -109,9 +151,12 @@ class _RouteServiceExamplePageState extends State<RouteServiceExamplePage> {
                       to: routeTargets[1],
                     );
 
-                    addRouteToMap(routeResultTwo!);
+                    addRouteToMap(
+                      routeResult: routeResultTwo!,
+                      routeColor: Colors.yellow,
+                    );
                   },
-                  backgroundColor: Colors.grey,
+                  backgroundColor: Colors.yellow,
                   child: const Icon(Icons.looks_two_sharp),
                 ),
               ],
@@ -122,9 +167,12 @@ class _RouteServiceExamplePageState extends State<RouteServiceExamplePage> {
     );
   }
 
-  Future<void> addRouteToMap(RouteResult routeResult) async {
+  Future<void> addRouteToMap({
+    required RouteResult routeResult,
+    Color routeColor = Colors.blue,
+  }) async {
     final polyLineSymbol = SimpleLineSymbol(
-      color: Colors.blue,
+      color: routeColor,
       width: 3,
     );
 
