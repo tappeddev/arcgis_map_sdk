@@ -4,6 +4,7 @@ import 'dart:core';
 import 'package:arcgis_example/export_image_example_page.dart';
 import 'package:arcgis_example/location_indicator_example_page.dart';
 import 'package:arcgis_example/map_elements.dart';
+import 'package:arcgis_example/route_service_example_page.dart';
 import 'package:arcgis_example/vector_layer_example_page.dart';
 import 'package:arcgis_map_sdk/arcgis_map_sdk.dart';
 import 'package:flutter/foundation.dart';
@@ -13,7 +14,8 @@ void main() => runApp(const ExampleApp());
 
 const arcGisApiKey = String.fromEnvironment(
   "ARCGIS-API-KEY",
-  defaultValue: "YOUR KEY HERE",
+  defaultValue:
+      "AAPTxy8BH1VEsoebNVZXo8HurFNSTIcZ0TWB-hZnKg6y1H1pKneORzX08zS7u6nnM2F2kEblEvpv7dOYzN5iZ_y91PtC-n9SMUygtFAhnovVhYyBMLQ-9yD5V5PnbF-bk5rGf5NlKMwS2GUaUsOk3HRXm0lpoVk-z18LnOLDe1_JSCfyI4i0oWV_vQjk6D3vPXqGojzmf10HrabqnQsjk2GdJ48YZo4321V-Z55W-w8rl_U.AT1_yyRqpep0",
   // request API key at https://developers.arcgis.com/dashboard/
 );
 
@@ -481,50 +483,6 @@ class _ExampleMapState extends State<ExampleMap> {
                               );
                             },
                           ),
-                          FloatingActionButton(
-                            heroTag: "route-to-closest-poi",
-                            onPressed: () {
-                              _controller?.determineClosestPOI(
-                                  from: RoutePoint(
-                                    name: "Tapped HQ",
-                                    latitude: tappedHQ.latitude,
-                                    longitude: tappedHQ.longitude,
-                                  ),
-                                  pois: [
-                                    RoutePoint(
-                                      name: "POI #1",
-                                      latitude: 48.204473809410615,
-                                      longitude: 11.4513423666358,
-                                    ),
-                                    RoutePoint(
-                                      name: "POI #2",
-                                      latitude: 48.205636645145659,
-                                      longitude: 11.395690217614174,
-                                    ),
-                                  ]);
-                            },
-                            backgroundColor: Colors.grey,
-                            child: const Icon(Icons.alt_route),
-                          ),
-                          FloatingActionButton(
-                            heroTag: "route-from-to",
-                            onPressed: () {
-                              _controller?.determineRouteFromTo(
-                                from: RoutePoint(
-                                  name: "Tapped HQ",
-                                  latitude: tappedHQ.latitude,
-                                  longitude: tappedHQ.longitude,
-                                ),
-                                to: RoutePoint(
-                                  name: "POI #2",
-                                  latitude: 48.205636645145659,
-                                  longitude: 11.395690217614174,
-                                ),
-                              );
-                            },
-                            backgroundColor: Colors.grey,
-                            child: const Icon(Icons.route),
-                          ),
                           if (kIsWeb)
                             FloatingActionButton(
                               heroTag: "3d-map-button",
@@ -567,6 +525,10 @@ class _ExampleMapState extends State<ExampleMap> {
                       ElevatedButton(
                         onPressed: _routeToLocationIndicatorExample,
                         child: const Text("Location indicator example"),
+                      ),
+                      ElevatedButton(
+                        onPressed: _routeToRouteServiceExample,
+                        child: const Text("Route service example"),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -854,6 +816,12 @@ class _ExampleMapState extends State<ExampleMap> {
   void _routeToExportImageExample() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const ExportImageExamplePage()),
+    );
+  }
+
+  void _routeToRouteServiceExample() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const RouteServiceExamplePage()),
     );
   }
 }
