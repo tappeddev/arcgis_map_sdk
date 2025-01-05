@@ -92,9 +92,6 @@ class _RouteServiceExamplePageState extends State<RouteServiceExamplePage> {
                       to: routeTargets[0],
                     );
 
-                    // TODO: Draw route on map with existing logic
-                    // Use _controller?.addGraphic() to draw the route
-                    // based on the routeResult.
                     addRouteToMap(routeResultOne!);
                   },
                   backgroundColor: Colors.grey,
