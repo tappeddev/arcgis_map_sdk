@@ -14,8 +14,7 @@ void main() => runApp(const ExampleApp());
 
 const arcGisApiKey = String.fromEnvironment(
   "ARCGIS-API-KEY",
-  defaultValue:
-      "AAPTxy8BH1VEsoebNVZXo8HurFNSTIcZ0TWB-hZnKg6y1H1pKneORzX08zS7u6nnM2F2kEblEvpv7dOYzN5iZ_y91PtC-n9SMUygtFAhnovVhYyBMLQ-9yD5V5PnbF-bk5rGf5NlKMwS2GUaUsOk3HRXm0lpoVk-z18LnOLDe1_JSCfyI4i0oWV_vQjk6D3vPXqGojzmf10HrabqnQsjk2GdJ48YZo4321V-Z55W-w8rl_U.AT1_yyRqpep0",
+  defaultValue: "YOUR KEY HERE",
   // request API key at https://developers.arcgis.com/dashboard/
 );
 
