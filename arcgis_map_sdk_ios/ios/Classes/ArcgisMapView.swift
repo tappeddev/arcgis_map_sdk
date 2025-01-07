@@ -75,7 +75,7 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
         mapView = AGSMapView.init(frame: frame)
 
         super.init()
-        
+
         if let isAttributionTextVisible = mapOptions.isAttributionTextVisible {
             mapView.isAttributionTextVisible = isAttributionTextVisible
         }
@@ -502,7 +502,7 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
         mapView.locationDisplay.autoPanMode = autoPanMode
         result(true)
     }
-    
+
     private func onGetAutoPanMode(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         // autoPanMode.rawValue is any of [0; 3]:
         // https://developers.arcgis.com/ios/api-reference/_a_g_s_location_display_8h.html
@@ -512,17 +512,17 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
         }
         return result(stringName)
     }
-    
+
     private func onSetWanderExtentFactor(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         guard let factor = call.arguments as? Double else {
             result(FlutterError(code: "missing_data", message: "Invalid argument, expected an WanderExtentFactor as Double.", details: nil))
             return
         }
-        
+
         mapView.locationDisplay.wanderExtentFactor = Float(factor)
         result(true)
     }
-    
+
     private func onGetWanderExtentFactor(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         return result(mapView.locationDisplay.wanderExtentFactor)
     }
@@ -549,13 +549,13 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
             result(FlutterError(code: "invalid_data", message: "Unknown data source type \(String(describing: type))", details: nil))
         }
     }
-    
+
     private func onUpdateIsAttributionTextVisible(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         guard let isVisible = call.arguments as? Bool else {
             result(FlutterError(code: "missing_data", message: "Invalid arguments", details: nil))
             return
         }
-        
+
         mapView.isAttributionTextVisible = isVisible
         result(true)
     }
