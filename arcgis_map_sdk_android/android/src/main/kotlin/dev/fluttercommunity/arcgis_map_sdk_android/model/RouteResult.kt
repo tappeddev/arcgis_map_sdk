@@ -3,6 +3,8 @@ package dev.fluttercommunity.arcgis_map_sdk_android.model
 import com.esri.arcgisruntime.tasks.networkanalysis.Route
 import dev.fluttercommunity.arcgis_map_sdk_android.gson
 
+// TODO(Jean): Rename this
+// ArcGIS already defines a RouteResult
 class RouteResult(
     val name: String,
     val paths: List<List<LatLng>>,
