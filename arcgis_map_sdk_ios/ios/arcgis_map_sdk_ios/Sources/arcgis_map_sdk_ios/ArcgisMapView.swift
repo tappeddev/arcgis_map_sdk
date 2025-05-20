@@ -67,7 +67,7 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
         hostingController.view.backgroundColor = .clear
 
         super.init()
-        
+
         if let isAttributionTextVisible = mapOptions.isAttributionTextVisible {
             mapContentView.viewModel.attributionBarHidden = !isAttributionTextVisible
         }
@@ -161,7 +161,7 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
             result(FlutterError(code: "missing_data", message: "Invalid arguments", details: nil))
             return
         }
-        
+
         guard let lodFactor = args["lodFactor"] as? Int else {
             result(FlutterError(code: "missing_data", message: "lodFactor not provided", details: nil))
             return
@@ -191,7 +191,7 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
             result(FlutterError(code: "missing_data", message: "Invalid arguments", details: nil))
             return
         }
-        
+
         guard let lodFactor = args["lodFactor"] as? Int else {
             result(FlutterError(code: "missing_data", message: "lodFactor not provided", details: nil))
             return
@@ -232,7 +232,7 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
             result(FlutterError(code: "missing_data", message: "Invalid arguments", details: nil))
             return
         }
-        
+
         do {
             let padding: ViewPadding = try JsonUtil.objectOfJson(args)
 
@@ -266,6 +266,7 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
                 if let zoomLevel = zoomLevel {
                     scale = ArcgisMapView.convertZoomLevelToMapScale(zoomLevel)
                 } else {
+                // TODO targetScale NAN?
                     scale = mapContentView.viewModel.viewpoint.targetScale
                 }
                 let success = await mapContentView.viewModel.mapViewProxy?.setViewpoint(
@@ -317,21 +318,21 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
             let graphic = object as! Graphic
             return graphic.attributes["id"] as? String
         }
-        
+
         let hasExistingGraphics = newGraphics.contains(where: { object in
             let graphic = object
             guard let id = graphic.attributes["id"] as? String else {
                 return false
             }
-            
+
             return existingIds.contains(id)
         })
-        
+
         if(hasExistingGraphics) {
             result(false)
             return
         }
-        
+
         // addObjects causes an internal exceptions this is why we add
         // them in this for loop instead.
         // ArcGis is the best <3.
@@ -387,12 +388,12 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
             result(FlutterError(code: "missing_data", message: "Invalid arguments", details: nil))
             return
         }
-        
+
         guard let enabled = args["enabled"] as? Bool else {
             result(FlutterError(code: "missing_data", message: "enabled arguments", details: nil))
             return
         }
-        
+
         setMapInteractive(enabled)
         result(true)
     }
@@ -507,7 +508,7 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
         mapContentView.viewModel.locationDisplay.autoPanMode = autoPanMode
         result(true)
     }
-    
+
     private func onGetAutoPanMode(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         // autoPanMode.rawValue is any of [0; 3]:
         // https://developers.arcgis.com/ios/api-reference/_a_g_s_location_display_8h.html
@@ -517,7 +518,7 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
         }
         return result(stringName)
     }
-    
+
     private func onSetWanderExtentFactor(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         guard let factor = call.arguments as? Double else {
             result(FlutterError(code: "missing_data", message: "Invalid argument, expected an WanderExtentFactor as Double.", details: nil))
@@ -527,7 +528,7 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
         mapContentView.viewModel.locationDisplay.wanderExtentFactor = Float(factor)
         result(true)
     }
-    
+
     private func onGetWanderExtentFactor(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         return result(mapContentView.viewModel.locationDisplay.wanderExtentFactor)
     }
@@ -556,7 +557,7 @@ class ArcgisMapView: NSObject, FlutterPlatformView {
             result(FlutterError(code: "invalid_data", message: "Unknown data source type \(String(describing: type))", details: nil))
         }
     }
-    
+
     private func onUpdateIsAttributionTextVisible(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         guard let isVisible = call.arguments as? Bool else {
             result(FlutterError(code: "missing_data", message: "Invalid arguments", details: nil))
