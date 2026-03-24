@@ -168,6 +168,12 @@ internal class ArcgisMapView(
 
     private fun setupMethodChannel() {
         methodChannel.setMethodCallHandler { call, result ->
+            if (call.method == "dispose") {
+                // Only used on iOS for now. No need to cleanup anything on android
+                result.success(true)
+                return@setMethodCallHandler
+            }
+
             if (isDisposed) {
                 result.error("disposed", "Map called with ${call.method} but ArcgisMapView has been disposed", null)
                 return@setMethodCallHandler
@@ -220,8 +226,6 @@ internal class ArcgisMapView(
 
                 "export_image" -> onExportImage(result)
 
-                "dispose" -> onDispose(result)
-
                 else -> result.notImplemented()
             }
         }
@@ -257,11 +261,6 @@ internal class ArcgisMapView(
                 result.finishWithError(e)
             }
         }
-    }
-
-    private fun onDispose(result: MethodChannel.Result) {
-        // Only used on iOS for now. No need to cleanup anything on android
-        result.success(true)
     }
 
     private fun onSetLocationDisplayDefaultSymbol(call: MethodCall, result: MethodChannel.Result) {
