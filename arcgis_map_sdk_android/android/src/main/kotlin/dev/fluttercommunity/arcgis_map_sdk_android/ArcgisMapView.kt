@@ -169,7 +169,7 @@ internal class ArcgisMapView(
     private fun setupMethodChannel() {
         methodChannel.setMethodCallHandler { call, result ->
             if (isDisposed) {
-                result.error("disposed", "ArcgisMapView has been disposed", null)
+                result.error("disposed", "Map called with ${call.method} but ArcgisMapView has been disposed", null)
                 return@setMethodCallHandler
             }
             when (call.method) {
