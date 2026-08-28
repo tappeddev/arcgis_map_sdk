@@ -164,6 +164,7 @@ internal class ArcgisMapView(
     }
 
     override fun dispose() {
+        if (isDisposed) return
         isDisposed = true
         methodChannel.setMethodCallHandler(null)
         zoomEventChannel.setStreamHandler(null)
@@ -179,8 +180,8 @@ internal class ArcgisMapView(
     private fun setupMethodChannel() {
         methodChannel.setMethodCallHandler { call, result ->
             if (call.method == "dispose") {
-                // Only used on iOS for now. No need to cleanup anything on android
                 result.success(true)
+                dispose()
                 return@setMethodCallHandler
             }
 
