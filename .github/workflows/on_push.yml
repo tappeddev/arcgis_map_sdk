@@ -1,7 +1,5 @@
 name: CI
 
-# Newer Flutter analysis SDKs omit dart:js_util used by the web implementation.
-# Upgrade this pin together with the migration to dart:js_interop.
 on: [push]
 
 jobs:
@@ -13,7 +11,6 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version: '3.35.7'
       - run: ./am deps
       - run: ./am analyze --fatal-warnings --fatal-infos
 
@@ -25,7 +22,6 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version: '3.35.7'
       - run: ./am deps
       - run: ./am format --verify
 
@@ -37,6 +33,5 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version: '3.35.7'
       - run: ./am deps
       - run: ./am test
