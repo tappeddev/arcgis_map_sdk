@@ -34,7 +34,7 @@ class ArcgisMapPlatform extends PlatformInterface {
     int mapId,
     void Function(double)? getZoom,
     String layerId,
-  ) async {
+  ) {
     throw UnimplementedError('addFeatureLayer() has not been implemented.');
   }
 
@@ -43,7 +43,7 @@ class ArcgisMapPlatform extends PlatformInterface {
     int mapId,
     String layerId,
     void Function(dynamic)? onPressed,
-  ) async {
+  ) {
     throw UnimplementedError('addGraphicsLayer() has not been implemented.');
   }
 
@@ -52,7 +52,7 @@ class ArcgisMapPlatform extends PlatformInterface {
     required String layerId,
     required String url,
     required int mapId,
-  }) async {
+  }) {
     throw UnimplementedError('addSceneLayer() has not been implemented.');
   }
 
@@ -68,7 +68,7 @@ class ArcgisMapPlatform extends PlatformInterface {
     throw UnimplementedError('setMouseCursor() has not been implemented');
   }
 
-  Future<void> setAutoPanMode(String autoPanMode, int mapId)  {
+  Future<void> setAutoPanMode(String autoPanMode, int mapId) {
     throw UnimplementedError('setAutoPanMode() has not been implemented');
   }
 
@@ -125,7 +125,7 @@ class ArcgisMapPlatform extends PlatformInterface {
     required int mapId,
     required String featureLayerId,
     required List<Graphic> data,
-  }) async {
+  }) {
     throw UnimplementedError('addFeatureLayer() has not been implemented.');
   }
 
@@ -143,7 +143,7 @@ class ArcgisMapPlatform extends PlatformInterface {
     );
   }
 
-  void dispose({required int mapId}) {
+  Future<void> dispose({required int mapId}) {
     throw UnimplementedError('dispose() has not been implemented.');
   }
 
@@ -276,10 +276,7 @@ class ArcgisMapPlatform extends PlatformInterface {
     );
   }
 
-  Future<void> setLocationDisplayPingAnimationSymbol(
-    int mapId,
-    Symbol symbol,
-  ) {
+  Future<void> setLocationDisplayPingAnimationSymbol(int mapId, Symbol symbol) {
     throw UnimplementedError(
       'setLocationDisplayPingAnimationSymbol() has not been implemented.',
     );
@@ -301,9 +298,7 @@ class ArcgisMapPlatform extends PlatformInterface {
   }
 
   Future<void> setLocationDisplay(int mapId, String type) {
-    throw UnimplementedError(
-      'setLocationDisplay() has not been implemented.',
-    );
+    throw UnimplementedError('setLocationDisplay() has not been implemented.');
   }
 
   Future<void> updateIsAttributionTextVisible(
