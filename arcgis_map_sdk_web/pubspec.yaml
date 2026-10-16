@@ -1,6 +1,6 @@
 name: arcgis_map_sdk_web
 description: Esri ArcGIS Flutter web implementation.
-version: 0.8.0
+version: 0.8.2-git
 repository: https://github.com/fluttercommunity/arcgis_map_sdk
 maintainer: Matthaios Saitakis (@MatthaiosSait), Pascal Welsch (@passsy), Max Peters (@maxpeters)
 
@@ -9,7 +9,7 @@ environment:
   flutter: ">=3.16.0"
 
 dependencies:
-  arcgis_map_sdk_platform_interface: ^1.0.1
+  arcgis_map_sdk_platform_interface: 1.0.2-git
   async: ^2.9.0
 
   flutter:

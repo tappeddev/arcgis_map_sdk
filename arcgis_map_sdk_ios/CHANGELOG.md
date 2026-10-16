@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.2 (05.10.2026)
+
+- Publish all_features_iteration_4-5-spm after merging main at ca24dfe0.
+- Pin internal dependencies to the coordinated Artifactory release.
+
 ## 0.8.0 (19.11.2023)
 
 - Change package name to `arcgis_map_sdk_ios`
